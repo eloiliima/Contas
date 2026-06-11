@@ -7,27 +7,28 @@ typedef struct {
 } Cliente;
 
 int main() {
-    FILE *f = fopen("dados.dat", "wb+");
+    FILE *f = fopen("dados.dat", "rb+");
+    if (!f) f = fopen("dados.dat", "wb+");
+    
     int op, pos, num;
     Cliente c;
-
     if (!f) return 1;
 
     do {
-        printf("\n1-Cadastrar em Posição Expecifica \n 2-Consultar Pelo Número da Conta \n 3-Saldo \n  4-Encerrar Cliente \n 5-Listar Clientes \n 6-Repetir Listagem \n 7-Sair\nOpcao: ");
-        scanf("%d", &op);
+        printf("MENU \n 1. Cadastrar um novo cliente em uma posicao especifica \n 2. Consultar um cliente pelo numero da conta \n 3. Atualizar o saldo de um cliente \n 4. Encerra conta \n 5. Listar todos os clientes \n 6. Restaurar a leitura do arquivo para repetir a listagem \n 7. Encerrar %d", &op);
 
         switch(op) {
             case 1:
-                printf("Posição, Conta, Nome, Saldo: ");
-                scanf("%d %d %s %lf", &pos, &c.conta, c.nome, &c.saldo);
+                printf("Posicao: "); scanf("%d", &pos);
+                printf("Conta: "); scanf("%d", &c.conta);
+                printf("Nome: "); scanf("%s", c.nome);
+                printf("Saldo: "); scanf("%lf", &c.saldo);
                 fseek(f, pos * sizeof(Cliente), SEEK_SET);
                 fwrite(&c, sizeof(Cliente), 1, f);
                 break;
 
             case 2:
-                printf("Digite o Número da Conta: ");
-                scanf("%d", &num);
+                printf("Conta: "); scanf("%d", &num);
                 rewind(f);
                 while(fread(&c, sizeof(Cliente), 1, f)) {
                     if(c.conta == num) printf("Nome: %s | Saldo: %.2f\n", c.nome, c.saldo);
@@ -35,13 +36,11 @@ int main() {
                 break;
 
             case 3:
-                printf("Digite o Número da Conta: ");
-                scanf("%d", &num);
+                printf("Conta: "); scanf("%d", &num);
                 rewind(f);
                 while(fread(&c, sizeof(Cliente), 1, f)) {
                     if(c.conta == num) {
-                        printf("Novo Saldo: ");
-                        scanf("%lf", &c.saldo);
+                        printf("Novo Saldo: "); scanf("%lf", &c.saldo);
                         fseek(f, -sizeof(Cliente), SEEK_CUR);
                         fwrite(&c, sizeof(Cliente), 1, f);
                         break;
@@ -50,9 +49,8 @@ int main() {
                 break;
 
             case 4:
-                printf("Posicao para remover: ");
-                scanf("%d", &pos);
-                c.conta = 0;
+                printf("Posicao: "); scanf("%d", &pos);
+                c.conta = 0; c.saldo = 0; c.nome[0] = '\0';
                 fseek(f, pos * sizeof(Cliente), SEEK_SET);
                 fwrite(&c, sizeof(Cliente), 1, f);
                 break;
@@ -60,13 +58,13 @@ int main() {
             case 5:
                 rewind(f);
                 while(fread(&c, sizeof(Cliente), 1, f)) {
-                    if(num != 0) printf("Conta: %d | Nome: %s | Saldo: %.2f\n", c.conta, c.nome, c.saldo);
+                    if(c.conta != 0) printf("Conta: %d | Nome: %s | Saldo: %.2f\n", c.conta, c.nome, c.saldo);
                 }
                 break;
 
             case 6:
                 rewind(f);
-                printf("Repetir Listagem\n");
+                printf("Listagem Repetida\n");
                 while(fread(&c, sizeof(Cliente), 1, f)) {
                     if(c.conta != 0) printf("Conta: %d | Nome: %s\n", c.conta, c.nome);
                 }
